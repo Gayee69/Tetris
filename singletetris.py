@@ -58,14 +58,23 @@ p1_left_canvas = tk.Canvas(main_frame, width=100, height=500, bg="black")
 p1_left_canvas.place(x=p1_left_sidebar_x, y=grid_y + 30)
 tk.Label(main_frame, text="Next Block", fg="white", bg="black", font=("Arial", 14)).place(x=p1_left_sidebar_x, y=grid_y)
 
+# Right Sidebar Elements
+p1_right_sidebar_x = p1_grid_x - 150
+
+# Hold
+tk.Label(main_frame, text="Hold", fg="white", bg="black", font=("Arial", 14)).place(x=p1_right_sidebar_x, y=grid_y)
 p1_right_canvas = tk.Canvas(main_frame, width=100, height=100, bg="black")
 p1_right_canvas.place(x=p1_right_sidebar_x, y=grid_y + 30)
-tk.Label(main_frame, text="Hold", fg="white", bg="black", font=("Arial", 14)).place(x=p1_right_sidebar_x, y=grid_y)
 
-score_var = tk.StringVar(value="Score: 0")
-combo_var = tk.StringVar(value="Combo: 0")
-tk.Label(main_frame, textvariable=score_var, fg="white", bg="black", font=("Arial", 14)).place(x=p1_right_sidebar_x, y=grid_y + 150)
-tk.Label(main_frame, textvariable=combo_var, fg="white", bg="black", font=("Arial", 14)).place(x=p1_right_sidebar_x, y=grid_y + 190)
+# Score
+tk.Label(main_frame, text="Score", fg="white", bg="black", font=("Arial", 14)).place(x=p1_right_sidebar_x, y=grid_y + 140)
+p1_score_canvas = tk.Canvas(main_frame, width=100, height=50, bg="black")
+p1_score_canvas.place(x=p1_right_sidebar_x, y=grid_y + 170)
+
+# Cleared Lines
+tk.Label(main_frame, text="Cleared Lines", fg="white", bg="black", font=("Arial", 14)).place(x=p1_right_sidebar_x, y=grid_y + 230)
+p1_lines_canvas = tk.Canvas(main_frame, width=100, height=50, bg="black")
+p1_lines_canvas.place(x=p1_right_sidebar_x, y=grid_y + 260)
 
 game_over_label = tk.Label(main_frame, text="Game Over", fg="white", bg="black", font=("Arial", 24))
 game_over_label.place(x=p1_grid_x + GRID_WIDTH // 2, y=grid_y + GRID_HEIGHT // 2)
@@ -79,7 +88,7 @@ class TetrisGame:
         self.hold_piece_data = None
         self.can_hold = True
         self.score = 0
-        self.combo = 0
+        self.cleared_lines = 0
         self.is_game_over = False
         self.new_piece()
         self.draw()
@@ -131,8 +140,18 @@ class TetrisGame:
                         self.draw_cell(p1_canvas, self.x + j, self.y + i, self.color)
         self.draw_preview()
         self.draw_hold()
-        score_var.set(f"Score: {self.score}")
-        combo_var.set(f"Combo: {self.combo}")
+        self.draw_score()
+        self.draw_cleared_lines()
+
+    def draw_score(self):
+        p1_score_canvas.delete("all")
+        p1_score_canvas.create_text(50, 25, text=str(self.score), 
+                                  fill="white", font=("Arial", 24))
+
+    def draw_cleared_lines(self):
+        p1_lines_canvas.delete("all")
+        p1_lines_canvas.create_text(50, 25, text=str(self.cleared_lines), 
+                                   fill="white", font=("Arial", 24))
 
     def draw_preview(self):
         p1_left_canvas.delete("all")
@@ -195,7 +214,7 @@ class TetrisGame:
     def clear_lines(self):
         new_board = [row for row in self.board if any(cell is None for cell in row)]
         cleared = ROWS - len(new_board)
-        self.combo = self.combo + 1 if cleared else 0
+        self.cleared_lines += cleared
         self.score += cleared * 100
         for _ in range(cleared):
             new_board.insert(0, [None for _ in range(COLUMNS)])
@@ -237,8 +256,6 @@ class TetrisGame:
         game_over_label.place(x=center_x, y=center_y)
         root.unbind("<Key>")
 
-
-
     def key_press(self, e):
         if self.is_game_over:
             return
@@ -268,15 +285,13 @@ class TetrisGame:
         else:
             if pause_menu:
                 pause_menu.destroy()
-            self.update()  # Restart the update loop after resuming
-
+            self.update()
 
     def show_help(self):
         help_win = tk.Toplevel(root)
         help_win.title("Help")
         help_win.geometry("400x300")
         tk.Label(help_win, text="Controls:\n← → ↓: Move\n↑: Rotate\nSpace: Hard Drop\nC: Hold\nEsc: Pause", justify="left").pack(padx=20, pady=20)
-
 
 TetrisGame()
 root.mainloop()
