@@ -14,7 +14,7 @@ GRID_WIDTH = COLUMNS * CELL_SIZE
 GRID_HEIGHT = ROWS * CELL_SIZE
 DELAY = 1000
 RENDER_DELAY = 33
-GRAVITY_DELAY = 500
+GRAVITY_DELAY = 1000
 
 SHAPES = {
     'I': [[1, 1, 1, 1]],
@@ -85,10 +85,24 @@ p1_lines_var = tk.StringVar(value="P1 Lines Cleared: 0")
 p2_score_var = tk.StringVar(value="P2 Score: 0")
 p2_lines_var = tk.StringVar(value="P2 Lines Cleared: 0")
 
-tk.Label(main_frame, textvariable=p1_score_var, fg="white", bg="black", font=("Arial", 14)).place(x=p1_right_sidebar_x, y=grid_y + 150)
-tk.Label(main_frame, textvariable=p1_lines_var, fg="white", bg="black", font=("Arial", 14)).place(x=p1_right_sidebar_x, y=grid_y + 190)
-tk.Label(main_frame, textvariable=p2_score_var, fg="white", bg="black", font=("Arial", 14)).place(x=p2_right_sidebar_x, y=grid_y + 150)
-tk.Label(main_frame, textvariable=p2_lines_var, fg="white", bg="black", font=("Arial", 14)).place(x=p2_right_sidebar_x, y=grid_y + 190)
+# --- Player 1 Score UI ---
+tk.Label(main_frame, text="Score", fg="white", bg="black", font=("Arial", 14)).place(x=p1_right_sidebar_x, y=grid_y + 140)
+p1_score_canvas = tk.Canvas(main_frame, width=100, height=50, bg="black", highlightthickness=0)
+p1_score_canvas.place(x=p1_right_sidebar_x, y=grid_y + 170)
+
+tk.Label(main_frame, text="Cleared Lines", fg="white", bg="black", font=("Arial", 14)).place(x=p1_right_sidebar_x, y=grid_y + 230)
+p1_lines_canvas = tk.Canvas(main_frame, width=100, height=50, bg="black", highlightthickness=0)
+p1_lines_canvas.place(x=p1_right_sidebar_x, y=grid_y + 260)
+
+# --- Player 2 Score UI ---
+tk.Label(main_frame, text="Score", fg="white", bg="black", font=("Arial", 14)).place(x=p2_right_sidebar_x, y=grid_y + 140)
+p2_score_canvas = tk.Canvas(main_frame, width=100, height=50, bg="black", highlightthickness=0)
+p2_score_canvas.place(x=p2_right_sidebar_x, y=grid_y + 170)
+
+tk.Label(main_frame, text="Cleared Lines", fg="white", bg="black", font=("Arial", 14)).place(x=p2_right_sidebar_x, y=grid_y + 230)
+p2_lines_canvas = tk.Canvas(main_frame, width=100, height=50, bg="black", highlightthickness=0)
+p2_lines_canvas.place(x=p2_right_sidebar_x, y=grid_y + 260)
+
 
 # === TETRIS LOGIC ===
 class Player:
@@ -170,6 +184,19 @@ class Player:
         self.draw_hold()
         self.score_var.set(f"Score: {self.score}")
         self.lines_var.set(f"Lines Cleared: {self.lines_cleared}")
+
+        # Draw on score/lines canvas for both players
+        if self.canvas == p1_canvas:
+            p1_score_canvas.delete("all")
+            p1_score_canvas.create_text(50, 25, text=str(self.score), fill="white", font=("Arial", 16))
+            p1_lines_canvas.delete("all")
+            p1_lines_canvas.create_text(50, 25, text=str(self.lines_cleared), fill="white", font=("Arial", 16))
+        elif self.canvas == p2_canvas:
+            p2_score_canvas.delete("all")
+            p2_score_canvas.create_text(50, 25, text=str(self.score), fill="white", font=("Arial", 16))
+            p2_lines_canvas.delete("all")
+            p2_lines_canvas.create_text(50, 25, text=str(self.lines_cleared), fill="white", font=("Arial", 16))
+
 
     def draw_preview(self):
         self.next_canvas.delete("all")
